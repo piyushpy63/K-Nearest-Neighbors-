@@ -1,2 +1,36 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+%matplolib inline
+
+ds=pd.read_csv("C:\\Users\\piyus\\OneDrive\\Desktop\\Classified Data.csv")
+ds.head()
+from sklearn.preprocessing import StandardScaler
+scaler=StandardScaler()
+scaler.fit(ds.drop('TARGET CLASS',axis=1))
+scaled_features=scaler.transform(ds.drop('TARGET CLASS',axis=1))
+ds_feat=pd.DataFrame(scaled_features,columns=ds.columns[:-1])
+ds_feat.head()
+sns.pairplot(ds,hue='TARGET CLASS')
+from sklearn.model_selection import train_test_split,cross_val_score
+
+x_train,x_test,y_train,y_test=train_test_split(scaled_features,ds['TARGET CLASS'],test_size=0.30)
+from sklearn.neighbors import KNeighborsClassifier
+knn=KNeighborsClassifier(n_neighbors=1)
+knn.fit(x_train,y_train)
+pred=knn.predict(x_test)
+from sklearn.metrics import confusion_matrix,classification_report
+print(confusion_matrix(y_test,pred))
+print(classification_report(y_test,pred))
+plt.figure(figsize=(10,6))
+plt.plot(range(1,40),accuracy_rate,color='blue', linestyle='dashed', marker='o',
+         markerfacecolor='red', markersize=7)
+plt.title('error_rate vs K value',size=25)
+plt.xlabel('K',size=25)
+plt.ylabel('Error Rate',color='red',size=25)
+
+
